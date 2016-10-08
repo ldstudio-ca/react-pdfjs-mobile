@@ -74,6 +74,30 @@ class App extends Component {
   	this._pdfViewer.currentPageNumber = pageNumber;
   }
 
+  onZoomIn = (ticks) => {
+  	console.log('onZoomIn');
+    var newScale = this._pdfViewer.currentScale;
+    do {
+      newScale = (newScale * DEFAULT_SCALE_DELTA).toFixed(2);
+      newScale = Math.ceil(newScale * 10) / 10;
+      newScale = Math.min(MAX_SCALE, newScale);
+    } while (--ticks && newScale < MAX_SCALE);
+    this._pdfViewer.currentScaleValue = newScale;
+
+  }
+
+  onZoomOut = (ticks) => {
+  	console.log('zoomOut');
+    var newScale = this._pdfViewer.currentScale;
+    do {
+      newScale = (newScale / DEFAULT_SCALE_DELTA).toFixed(2);
+      newScale = Math.floor(newScale * 10) / 10;
+      newScale = Math.max(MIN_SCALE, newScale);
+    } while (--ticks && newScale > MIN_SCALE);
+    this._pdfViewer.currentScaleValue = newScale;
+
+  }
+
   setTitle = (title) => {
   	this.setState( { title } );
   }
@@ -208,8 +232,8 @@ class App extends Component {
 				min="1"
 			></input>
 
-			<Button className="zoomOut" title="Zoom Out" id="zoomOut"></Button>
-			<Button className="zoomIn" title="Zoom In" id="zoomIn"></Button>
+			<Button className="zoomOut" onClick={this.onZoomOut} title="Zoom Out" id="zoomOut"></Button>
+			<Button className="zoomIn"  onClick={this.onZoomIn} title="Zoom In" id="zoomIn"></Button>
 
       	</Footer>
       </div>
