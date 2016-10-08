@@ -1,0 +1,48 @@
+{
+  "name": "react-pdfjs-mobile",
+  "version": "0.7.0",
+  "description": "React component for displaying PDF using PDFJS in mobile optimized view",
+  "scripts": {
+    "start": "node server.js",
+    "lint": "eslint src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ldstudio-ca/react-pdfjs-mobile.git"
+  },
+  "keywords": [
+    "react",
+    "reactjs",
+    "pdfjs",
+    "webpack"
+  ],
+  "author": "Larry Rivera <larry_rivera@mac.com> (http://github.com/ldstudio-ca)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ldstudio-ca/react-pdfjs-mobile/issues"
+  },
+  "homepage": "https://github.com/ldstudio-ca/react-pdfjs-mobile",
+  "devDependencies": {
+    "babel-core": "^6.0.20",
+    "babel-eslint": "^4.1.3",
+    "babel-loader": "^6.0.1",
+    "babel-preset-es2015": "^6.0.15",
+    "babel-preset-react": "^6.0.15",
+    "babel-preset-stage-0": "^6.0.15",
+    "css-loader": "^0.25.0",
+    "eslint": "^1.10.3",
+    "eslint-plugin-react": "^3.6.2",
+    "file-loader": "^0.9.0",
+    "react-hot-loader": "^1.3.0",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.12.1"
+  },
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "pdfjs-dist": "^1.6.221",
+    "react": "^0.14.6",
+    "react-dom": "^0.14.6"
+  }
+}
