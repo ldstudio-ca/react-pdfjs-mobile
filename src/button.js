@@ -11,10 +11,8 @@ class Button extends React.Component {
 	render() {
 		return (
 			<button 
+			{ ...this.props}
 				className={classNames(this.props.className, 'toolbarButton')} 
-				onClick={this.props.onClick}
-				title={this.props.title}
-				disabled={this.props.disabled||false}
 			>
 				{this.props.children}
 				
