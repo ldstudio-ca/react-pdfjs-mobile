@@ -15,67 +15,60 @@ const MAX_SCALE = 10.0;
 const DEFAULT_SCALE_VALUE = 'auto';
 
 class App extends Component {
-  
-  constructor(props){
-  	super(props);
 
-  	console.log(props.url)
-  	window.PDFJS = PDFJS;
-  	console.log(PDFJS)
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      pageNumber: 1,
+      pdfPageCount: 0,
+      title: 'sample-title.pdf',
+      pdf: null,
+      loadingProgress: 0
+    }
 
-  	this.pdfPageCount = 0;
-  	this.state = {
-  		pageNumber: 1,
-  		title: 'sample-title.pdf',
-  		pdf: null,
-  		loadingProgress: 0
-  	}
+    this.initializePDFJS();
 
-  	this.initializePDFJS();
-
-  	this._pdfLoadingTask = null;
-  	this._pdfDocument = null;
-  	this._pdfViewer = null;
-  	this._pdfHistory = null;
-  	this._pdfLinkService = null;
+    this._pdfLoadingTask = null;
+    this._pdfDocument = null;
+    this._pdfViewer = null;
+    this._pdfHistory = null;
+    this._pdfLinkService = null;
   }
 
-  initializePDFJS(){
-  	PDFJS.useOnlyCssZoom = true;
-	PDFJS.disableTextLayer = true;
-	PDFJS.maxImageSize = 1024 * 1024;
-	// @todo implement
-	// PDFJS.workerSrc = '../../build/dist/build/pdf.worker.js';
-	// PDFJS.cMapUrl = '../../build/dist/cmaps/';
-	// PDFJS.cMapPacked = true;
+  initializePDFJS() {
+    PDFJS.useOnlyCssZoom = true;
+    PDFJS.disableTextLayer = true;
+    PDFJS.maxImageSize = -1;//4096 * 4096;
+    // @todo implement
+    // PDFJS.workerSrc = '../../build/dist/build/pdf.worker.js';
+    // PDFJS.cMapUrl = '../../build/dist/cmaps/';
+    // PDFJS.cMapPacked = true;
   }
 
   loadingProgressHandler = (progressData) => {
-  	   this.setState({ loadingProgress: (progressData.loaded / progressData.total) })
-      console.log(progressData.loaded / progressData.total);
+    this.setState({ loadingProgress: (progressData.loaded / progressData.total) })
+    console.log(progressData.loaded / progressData.total);
   }
 
   onPageNumberChange = (e) => {
-  	console.log(e);
+    console.log(e);
 
   }
 
   onPageUp = () => {
-  	console.log('onPageUp');
-  	let pageNumber = this.state.pageNumber + 1;
-  	this.setState({ pageNumber });
-  	this._pdfViewer.currentPageNumber = pageNumber;
+    let pageNumber = this.state.pageNumber + 1;
+    this.setState({ pageNumber });
+    this._pdfViewer.currentPageNumber = pageNumber;
   }
 
   onPageDown = () => {
-  	console.log('onPageDown');
-  	let pageNumber = this.state.pageNumber - 1;
-  	this.setState({ pageNumber });
-  	this._pdfViewer.currentPageNumber = pageNumber;
+    let pageNumber = this.state.pageNumber - 1;
+    this.setState({ pageNumber });
+    this._pdfViewer.currentPageNumber = pageNumber;
   }
 
   onZoomIn = (ticks) => {
-  	console.log('onZoomIn');
     var newScale = this._pdfViewer.currentScale;
     do {
       newScale = (newScale * DEFAULT_SCALE_DELTA).toFixed(2);
@@ -87,7 +80,6 @@ class App extends Component {
   }
 
   onZoomOut = (ticks) => {
-  	console.log('zoomOut');
     var newScale = this._pdfViewer.currentScale;
     do {
       newScale = (newScale / DEFAULT_SCALE_DELTA).toFixed(2);
@@ -99,37 +91,38 @@ class App extends Component {
   }
 
   setTitle = (title) => {
-  	this.setState( { title } );
+    this.setState({ title });
   }
 
-  get pagesCount(){
-  	return this.pdfPageCount;
+  pageCount = () => {
+    return this.state.pdfPageCount;
+  }
+
+  get page() {
+    if (this._pdfViewer) {
+      return this._pdfViewer.currentPageNumber;
+    }
+  }
+
+  set page(page) {
 
   }
 
-  set pagesCount(count){
-  	this.pdfPageCount = count;
-  }
+  componentDidMount() {
+    console.log('pdfview application loaded');
 
-  componentDidMount(){
-  	console.log('pdfview application loaded');
-
-	let linkService = new PDFJS.PDFLinkService();
+    let linkService = new PDFJS.PDFLinkService();
     this._pdfLinkService = linkService;
-    
-    console.log(this._viewer);
 
-	let container = this._viewer.viewerContainer;
-	console.log(container);
+    let container = this._viewer.viewerContainer;
+    console.log(container);
 
     let pdfViewer = new PDFJS.PDFViewer({
-       container: container,
-       linkService: linkService
+      container: container,
+      linkService: linkService
     });
-    
-    this._pdfViewer = pdfViewer;
 
-    window.pdfViewer = pdfViewer;
+    this._pdfViewer = pdfViewer;
 
     linkService.setViewer(pdfViewer);
 
@@ -141,16 +134,26 @@ class App extends Component {
 
 
 
-    container.addEventListener('pagesinit',  () => {
+    container.addEventListener('pagesinit', () => {
       // We can use pdfViewer now, e.g. let's change default scale.
       pdfViewer.currentScaleValue = DEFAULT_SCALE_VALUE;
     });
 
-    this.animationStarted().then( () => {
-    	console.log('ready to open the pdf');
-
-    	if(this.props.url) this.openPDF();
+    this.animationStarted().then(() => {
+      console.log('ready to open the pdf');
+      if (this.props.url) this.openPDF();
     });
+  }
+  setTitleUsingUrl = (url) => {
+    this._url = url;
+    var title = PDFJS.getFilenameFromUrl(url) || url;
+    try {
+      title = decodeURIComponent(title);
+    } catch (e) {
+      // decodeURIComponent may throw URIError,
+      // fall back to using the unprocessed url in that case
+    }
+    this.setTitle(title);
   }
 
   setTitleUsingMetadata = (pdfDocument) => {
@@ -162,10 +165,10 @@ class App extends Component {
 
       // Provides some basic debug information
       console.log('PDF ' + pdfDocument.fingerprint + ' [' +
-                  info.PDFFormatVersion + ' ' + (info.Producer || '-').trim() +
-                  ' / ' + (info.Creator || '-').trim() + ']' +
-                  ' (PDF.js: ' + (PDFJS.version || '-') +
-                  (!PDFJS.disableWebGL ? ' [WebGL]' : '') + ')');
+        info.PDFFormatVersion + ' ' + (info.Producer || '-').trim() +
+        ' / ' + (info.Creator || '-').trim() + ']' +
+        ' (PDF.js: ' + (PDFJS.version || '-') +
+        (!PDFJS.disableWebGL ? ' [WebGL]' : '') + ')');
 
       var pdfTitle;
       if (metadata && metadata.has('dc:title')) {
@@ -185,67 +188,122 @@ class App extends Component {
         this.setTitle(pdfTitle + ' - ' + document.title);
       }
     });
-  
+
   }
 
-  openPDF(){
-		let loadingTask = PDFJS.getDocument(this.props.url);
-	  	this._pdfLoadingTask = loadingTask;
-	    loadingTask.onProgress = this.loadingProgressHandler;
+  openPDF() {
 
-	    return loadingTask.promise.then( (pdfDocument) => {
-      		// Document loaded, specifying document for the viewer.
-      		this._pdfDocument = pdfDocument;
-      		this.setState({ pdf: pdfDocument});
-      		this._pdfViewer.setDocument(pdfDocument);
-      		this._pdfLinkService.setDocument(pdfDocument);
-      		this._pdfHistory.initialize(pdfDocument.fingerprint);
+    if (this._pdfLoadingTask) {
+      // We need to destroy already opened document
+      return this.close().then(() => {
+        // ... and repeat the open() call.
+        return this.openPDF();
+      });
+    }
 
+    if(typeof this.props.url === 'string'){
+    	this.setTitleUsingUrl(this.props.url);
+	}
 
-      		this.setTitleUsingMetadata(pdfDocument);
+    let loadingTask = PDFJS.getDocument(this.props.url);
+    this._pdfLoadingTask = loadingTask;
+
+    loadingTask.onProgress = this.loadingProgressHandler;
+
+    return loadingTask.promise.then((pdfDocument) => {
+      // Document loaded, specifying document for the viewer.
+      this._pdfDocument = pdfDocument;
+      
+      this.setState({ 
+        pdf: pdfDocument,
+        pdfPageCount: pdfDocument.numPages 
+      });
+      
+      // this.pdfPageCount = pdfDocument
+      this._pdfViewer.setDocument(pdfDocument);
+      this._pdfLinkService.setDocument(pdfDocument);
+      this._pdfHistory.initialize(pdfDocument.fingerprint);
+
+      this.setTitleUsingMetadata(pdfDocument);
   		});
   }
 
-  animationStarted(){
-  	return new Promise( (resolve) => {
-  		window.requestAnimationFrame(resolve);
-  	})
+  close = () => {
+
+    // var errorWrapper = document.getElementById('errorWrapper');
+    // errorWrapper.setAttribute('hidden', 'true');
+
+    if (!this._pdfLoadingTask) {
+      return Promise.resolve();
+    }
+
+    var promise = this._pdfLoadingTask.destroy();
+    this._pdfLoadingTask = null;
+
+    if (this._pdfDocument) {
+      this._pdfDocument = null;
+
+      this._pdfViewer.setDocument(null);
+      this._pdfLinkService.setDocument(null, null);
+    }
+
+    return promise;
+
+  }
+
+  animationStarted() {
+    return new Promise((resolve) => {
+      window.requestAnimationFrame(resolve);
+    })
   }
 
   render() {
     return (
-    	<div>
-    	<Title title={ this.state.title }/>
-    	<Viewer  ref={(c) => this._viewer = c}  />
-      	<Footer>
-      		
-			<Button className="pageDown" onClick={this.onPageDown} title="Previous Page" id="previous"></Button>
-			<Button className="pageUp" onClick={this.onPageUp} title="Next Page" id="next"></Button>
-      		
-			<input 
-				type="number" 
-				id="pageNumber" 
-				className="toolbarField pageNumber" 
-				value={this.state.pageNumber}
-				onChange={this.onPageNumberChange}
-				size="4" 
-				min="1"
-			></input>
+      <div>
+        <Title title={ this.state.title }/>
+        <Viewer  ref={(c) => this._viewer = c}  />
+        <Footer>
 
-			<Button className="zoomOut" onClick={this.onZoomOut} title="Zoom Out" id="zoomOut"></Button>
-			<Button className="zoomIn"  onClick={this.onZoomIn} title="Zoom In" id="zoomIn"></Button>
+          <Button 
+            className="pageDown" 
+            onClick={this.onPageDown} 
+            title="Previous Page" 
+            id="previous"
+            disabled={this.state.pageNumber === 1} 
+          ></Button>
 
-      	</Footer>
+          <Button 
+            className="pageUp" 
+            onClick={this.onPageUp} 
+            title="Next Page" 
+            id="next"
+            disabled={this.state.pageNumber === this.state.pdfPageCount} 
+          ></Button>
+
+          <input
+            type="number"
+            id="pageNumber"
+            className="toolbarField pageNumber"
+            value={this.state.pageNumber}
+            onChange={this.onPageNumberChange}
+            size="4"
+            min="1"
+            ></input>
+
+          <Button className="zoomOut" onClick={this.onZoomOut} title="Zoom Out" id="zoomOut"></Button>
+          <Button className="zoomIn"  onClick={this.onZoomIn} title="Zoom In" id="zoomIn"></Button>
+
+        </Footer>
       </div>
     );
   }
 }
 
 App.propTypes = {
-	url: React.PropTypes.oneOfType([
+  url: React.PropTypes.oneOfType([
     React.PropTypes.string,
     React.PropTypes.array
-    ]).isRequired
+  ]).isRequired
 }
 
 export default App;

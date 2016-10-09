@@ -13,8 +13,11 @@ class Button extends React.Component {
 			<button 
 				className={classNames(this.props.className, 'toolbarButton')} 
 				onClick={this.props.onClick}
-				title={this.props.title}>
-					{this.props.children}
+				title={this.props.title}
+				disabled={this.props.disabled||false}
+			>
+				{this.props.children}
+				
 			</button>
 		);
 	}

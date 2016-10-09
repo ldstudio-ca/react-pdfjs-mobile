@@ -1,6 +1,6 @@
 {
   "name": "react-pdfjs-mobile",
-  "version": "0.7.0",
+  "version": "0.7.91",
   "description": "React component for displaying PDF using PDFJS in mobile optimized view",
   "scripts": {
     "start": "node server.js",
@@ -10,11 +10,17 @@
     "type": "git",
     "url": "https://github.com/ldstudio-ca/react-pdfjs-mobile.git"
   },
+  "tags": [
+    "react",
+    "pdf",
+    "pdfjs",
+    "modile"
+  ],
   "keywords": [
     "react",
-    "reactjs",
+    "pdf",
     "pdfjs",
-    "webpack"
+    "modile"
   ],
   "author": "Larry Rivera <larry_rivera@mac.com> (http://github.com/ldstudio-ca)",
   "license": "MIT",
@@ -39,10 +45,17 @@
     "webpack": "^1.12.2",
     "webpack-dev-server": "^1.12.1"
   },
+  "main": "./dist/react-pdfjs-mobile.min",
+  "files": [
+    "dist",
+    "css"
+  ],
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
+    "react-dom": "^0.14.0 || ^15.0.0"
+  },
   "dependencies": {
     "classnames": "^2.2.5",
-    "pdfjs-dist": "^1.6.221",
-    "react": "^0.14.6",
-    "react-dom": "^0.14.6"
+    "pdfjs-dist": "^1.6.221"
   }
 }
