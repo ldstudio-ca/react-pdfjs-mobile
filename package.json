@@ -1,6 +1,6 @@
 {
   "name": "react-pdfjs-mobile",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "React component for displaying PDF using PDFJS in mobile optimized view",
   "scripts": {
     "start": "node server.js",
