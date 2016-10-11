@@ -16,9 +16,7 @@ var reactDOMExternal = {
 };
 
 module.exports = {
-
   entry: {
-    'react-pdfjs-mobile': './src/index.js',
     'react-pdfjs-mobile.min': './src/index.js'
   },
 
@@ -42,13 +40,28 @@ module.exports = {
         'NODE_ENV': JSON.stringify('production')
       }
     }),
+    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
     new UglifyJsPlugin({
       include: /\.min\.js$/,
       minimize: true,
       compress: {
         warnings: false
       }
-    })
+    }),
+
+    new UglifyJsPlugin({
+      include: /\.chunk\.js$/,
+      minimize: true,
+      compress: {
+        warnings: false
+      }
+    }),
+    new webpack.DefinePlugin({
+      "process.env": {
+        NODE_ENV: JSON.stringify("production")
+      }
+    }),
+    new webpack.NoErrorsPlugin()
   ],
 
   module: {
