@@ -31,14 +31,16 @@ module.exports = {
     filename: '[name].js',
     chunkFilename: '[id].chunk.js',
     path: 'dist',
-    publicPath: '/',
+    publicPath: '/static/',
     libraryTarget: 'umd',
     library: 'ReactPDFJS'
   },
 
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
     }),
     new UglifyJsPlugin({
       include: /\.min\.js$/,
@@ -56,7 +58,7 @@ module.exports = {
         test: /\.css$/,
         loader: "style-loader!css-loader"
       },
-      { test: /\.png$/, loader: "url-loader?limit=100000" },
+      { test: /\.(png|gif)$/, loader: "url-loader?limit=100000" },
       { test: /\.jpg$/, loader: "file-loader" }
     ]
   }
