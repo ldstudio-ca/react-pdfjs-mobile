@@ -17,13 +17,8 @@ console.log('PDFJS-viewer');
 /* umdutils ignore */
 
 (function(root, factory) {
-    'use strict';
-
         factory(exports, require('pdfjs-dist'));
-
 }(this, function(exports, pdfjsLib) {
-    'use strict';
-
     var pdfViewerLibs = {
         pdfjsWebPDFJS: pdfjsLib
     };
