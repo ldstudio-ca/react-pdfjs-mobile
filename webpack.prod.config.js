@@ -45,6 +45,7 @@ module.exports = {
       include: /\.min\.js$/,
       minimize: true,
       compress: {
+        drop_console: true,
         warnings: false
       }
     }),
