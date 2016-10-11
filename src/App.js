@@ -3,8 +3,8 @@ import Button from './button';
 import Title from './Title';
 import Footer from './Footer';
 import Viewer from './viewer';
-// import PDFJS from 'pdfjs-dist';
 import { PDFJS } from './pdfjs/pdfjs-viewer';
+import ProgressBar from './progress-bar';
 
 import './css/style.css';
 
@@ -24,7 +24,8 @@ class App extends Component {
       pdfPageCount: 0,
       title: 'sample-title.pdf',
       pdf: null,
-      loadingProgress: 0
+      loadingProgress: 0,
+      percent: 0
     }
 
     this.initializePDFJS();
@@ -46,14 +47,19 @@ class App extends Component {
     // PDFJS.cMapPacked = true;
   }
 
+  /**
+   * handle pdf loading progress
+   * @param {object} progressData
+   */
   loadingProgressHandler = (progressData) => {
-    this.setState({ loadingProgress: (progressData.loaded / progressData.total) })
+    let percent = progressData.loaded / progressData.total;
+    this.progress(percent);
+    this.setState({ loadingProgress: percent });
     console.log(progressData.loaded / progressData.total);
   }
 
   onPageNumberChange = (e) => {
     console.log(e);
-
   }
 
   onPageUp = () => {
@@ -132,12 +138,15 @@ class App extends Component {
 
     linkService.setHistory(this._pdfHistory);
 
-
-
     container.addEventListener('pagesinit', () => {
       // We can use pdfViewer now, e.g. let's change default scale.
       pdfViewer.currentScaleValue = DEFAULT_SCALE_VALUE;
     });
+
+    container.addEventListener('pagechange', (evt) => {
+      let pageNumber = evt.pageNumber;
+      this.setState({ pageNumber });;
+    }, true);
 
     this.animationStarted().then(() => {
       console.log('ready to open the pdf');
@@ -191,6 +200,9 @@ class App extends Component {
 
   }
 
+  /**
+   * opens the pdf in the url prop
+   */
   openPDF() {
 
     if (this._pdfLoadingTask) {
@@ -228,6 +240,16 @@ class App extends Component {
   		});
   }
 
+  progress = (level) => {
+    var percent = Math.round(level * 100);
+    // Updating the bar if value increases.
+    if (percent >this.state.percent || isNaN(percent)) {
+      this.setState({ percent });
+    }
+  }
+
+  set loadingBar(x){}
+
   close = () => {
 
     // var errorWrapper = document.getElementById('errorWrapper');
@@ -259,8 +281,9 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <div className="pdf-viewer">
         <Title title={ this.state.title }/>
+        <ProgressBar percent={this.state.percent} ref={ (c) => this._progressBar = c } />
         <Viewer  ref={(c) => this._viewer = c}  />
         <Footer>
 
@@ -290,6 +313,13 @@ class App extends Component {
             min="1"
             ></input>
 
+          <Button 
+            className="close" 
+            onClick={this.props.onClose} 
+            title="Close" 
+            id="close"
+          ></Button>
+
           <Button className="zoomOut" onClick={this.onZoomOut} title="Zoom Out" id="zoomOut"></Button>
           <Button className="zoomIn"  onClick={this.onZoomIn} title="Zoom In" id="zoomIn"></Button>
 
@@ -300,11 +330,8 @@ class App extends Component {
 }
 
 App.propTypes = {
-  url: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.array
-  ]).isRequired
+  url: React.PropTypes.any.isRequired,
+  onClose: React.PropTypes.func
 }
 
 export default App;
-
