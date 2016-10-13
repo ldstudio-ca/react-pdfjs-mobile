@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
+import injectSheet, { jss } from 'react-jss';
+
 import Button from './button';
 import Title from './Title';
 import Footer from './Footer';
 import Viewer from './viewer';
 import { PDFJS } from './pdfjs/pdfjs-viewer';
 import ProgressBar from './progress-bar';
-
+import styles from './styles';
 import './css/style.css';
 
 // const DEFAULT_URL = '../../web/compressed.tracemonkey-pldi-09.pdf';
@@ -14,11 +16,25 @@ const MIN_SCALE = 0.25;
 const MAX_SCALE = 10.0;
 const DEFAULT_SCALE_VALUE = 'auto';
 
+const style = {
+  pdfviewerBody: {
+    background: 'url(' + require('./css/images/document_bg.png') + ')',
+    color: '#fff',
+    fontFamily: 'sans-serif',
+    fontSize: 10,
+    height: '100%',
+    width: '100%',
+    overflow: 'hidden',
+    paddingBottom: '5rem'
+  }
+}
+
+let sheet;
 class App extends Component {
 
   constructor(props) {
     super(props);
-    
+
     this.state = {
       pageNumber: 1,
       pdfPageCount: 0,
@@ -110,11 +126,20 @@ class App extends Component {
     }
   }
 
-  set page(page) {
+  set page(page) { }
 
+  componentWillUnmount() {
+    console.log('pdfviewer unmounted');
+    jss.removeStyleSheet(sheet)
+    this.close();
   }
 
   componentDidMount() {
+
+    sheet = jss.createStyleSheet(styles, { named: false }).attach()
+    // document.html.classList.toggle('html', true)
+    document.body.classList.toggle('body', true)
+
     console.log('pdfview application loaded');
 
     let linkService = new PDFJS.PDFLinkService();
@@ -213,9 +238,9 @@ class App extends Component {
       });
     }
 
-    if(typeof this.props.url === 'string'){
-    	this.setTitleUsingUrl(this.props.url);
-	}
+    if (typeof this.props.url === 'string') {
+      this.setTitleUsingUrl(this.props.url);
+    }
 
     let loadingTask = PDFJS.getDocument(this.props.url);
     this._pdfLoadingTask = loadingTask;
@@ -225,32 +250,35 @@ class App extends Component {
     return loadingTask.promise.then((pdfDocument) => {
       // Document loaded, specifying document for the viewer.
       this._pdfDocument = pdfDocument;
-      
-      this.setState({ 
+
+      this.setState({
         pdf: pdfDocument,
-        pdfPageCount: pdfDocument.numPages 
+        pdfPageCount: pdfDocument.numPages
       });
-      
+
       // this.pdfPageCount = pdfDocument
       this._pdfViewer.setDocument(pdfDocument);
       this._pdfLinkService.setDocument(pdfDocument);
       this._pdfHistory.initialize(pdfDocument.fingerprint);
 
       this.setTitleUsingMetadata(pdfDocument);
-  		});
+    });
   }
 
   progress = (level) => {
     var percent = Math.round(level * 100);
     // Updating the bar if value increases.
-    if (percent >this.state.percent || isNaN(percent)) {
+    if (percent > this.state.percent || isNaN(percent)) {
       this.setState({ percent });
     }
   }
 
-  set loadingBar(x){}
+  set loadingBar(x) { }
 
   close = () => {
+
+    console.log('closing pdfjs');
+
 
     // var errorWrapper = document.getElementById('errorWrapper');
     // errorWrapper.setAttribute('hidden', 'true');
@@ -281,27 +309,27 @@ class App extends Component {
 
   render() {
     return (
-      <div className="pdf-viewer">
-        <Title title={ this.state.title }/>
-        <ProgressBar percent={this.state.percent} ref={ (c) => this._progressBar = c } />
-        <Viewer  ref={(c) => this._viewer = c}  />
+      <div id="pdfViewer" className="pdf-viewer" style={style.pdfviewerBody}>
+        <Title title={this.state.title} />
+        <ProgressBar percent={this.state.percent} ref={(c) => this._progressBar = c} />
+        <Viewer ref={(c) => this._viewer = c} />
         <Footer>
 
-          <Button 
-            className="pageDown" 
-            onClick={this.onPageDown} 
-            title="Previous Page" 
+          <Button
+            className="pageDown"
+            onClick={this.onPageDown}
+            title="Previous Page"
             id="previous"
-            disabled={this.state.pageNumber === 1} 
-          ></Button>
+            disabled={this.state.pageNumber === 1}
+            ></Button>
 
-          <Button 
-            className="pageUp" 
-            onClick={this.onPageUp} 
-            title="Next Page" 
+          <Button
+            className="pageUp"
+            onClick={this.onPageUp}
+            title="Next Page"
             id="next"
-            disabled={this.state.pageNumber === this.state.pdfPageCount} 
-          ></Button>
+            disabled={this.state.pageNumber === this.state.pdfPageCount}
+            ></Button>
 
           <input
             type="number"
@@ -313,15 +341,15 @@ class App extends Component {
             min="1"
             ></input>
 
-          <Button 
-            className="close" 
-            onClick={this.props.onClose} 
-            title="Close" 
+          <Button
+            className="close"
+            onClick={this.props.onClose}
+            title="Close"
             id="close"
-          ></Button>
+            ></Button>
 
           <Button className="zoomOut" onClick={this.onZoomOut} title="Zoom Out" id="zoomOut"></Button>
-          <Button className="zoomIn"  onClick={this.onZoomIn} title="Zoom In" id="zoomIn"></Button>
+          <Button className="zoomIn" onClick={this.onZoomIn} title="Zoom In" id="zoomIn"></Button>
 
         </Footer>
       </div>

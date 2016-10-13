@@ -1,5 +1,25 @@
 import React from 'react';
 
+const style = {
+    loadingBar: {
+        position: 'relative',
+        height: '.4rem',
+        borderBottom: '.11rem solid rgb(180,188,240)',
+        zIndex: 100,
+        backgroundColor: '#2D4452',
+        boxShadow: '0 0 6px 2px rgba(210,208,210, 0.8)',
+        display: 'block'//this.props.percent === 100 ? 'none': 'block'
+    },
+    progress: {
+        position: 'absolute',
+        left: 0,
+        width: 0,
+        height: '100%',
+        backgroundColor: 'rgb(185,199,212)',
+        overflow: 'hidden',
+        transition: 'width 200ms'
+    }
+}
 /**
  * ProgressBar Component 
  * 
@@ -9,7 +29,7 @@ import React from 'react';
 class ProgressBar extends React.Component {
 
     static defaultProps = {
-        percent : '0'
+        percent: '0'
     }
 
     /**
@@ -27,16 +47,17 @@ class ProgressBar extends React.Component {
      */
     render() {
         return (
-            <div id="loadingBar" 
-                ref={ (c) => this._loadingBar = c }
-                style={{
-                    display: this.props.percent === 100 ? 'none': 'block'
+            <div id="loadingBar"
+                ref={(c) => this._loadingBar = c}
+                style={{ 
+                    ...style.loadingBar,
+                    display: this.props.percent === 100 ? 'none': 'block' 
                 }}
                 >
-                <div className="progress" style={{
+                <div style={{
+                    ...style.progress,
                     width: `${this.props.percent}%`
                 }}></div>
-                <div className="glimmer"></div>
             </div>
         );
     }
